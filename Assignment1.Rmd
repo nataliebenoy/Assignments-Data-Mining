@@ -1,0 +1,295 @@
+---
+title: "Assignment 1"
+author: "Natalie Benoy"
+date: "1/10/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Install Data & Packages
+```{r}
+library(tidyverse)
+usedcars <- read_csv("usedcars.csv")
+houseprices <- read_csv("1b_HousePrices.csv")
+toyota <- read_csv("1c_ToyotaCorolla.csv")
+```
+
+```{r}
+# turn character variables into factors
+usedcars <- usedcars %>%
+  mutate(model = factor(model),
+         color = factor(color),
+         transmission = factor(transmission))
+
+glimpse(usedcars)
+
+# get observations of cars with prices > 18000
+usedcars$price > 18000
+usedcars[usedcars$price > 18000,]
+
+# retrieve observations of cars with price > 18000 and color = yellow
+usedcars[usedcars$price > 18000 & usedcars$color == "Yellow",]
+
+# interquartile range of price
+IQR(usedcars$price)
+
+# percentiles of price at 20% increments
+quantile(usedcars$price, c(0, 0.2, 0.4, 0.6, 0.8, 1))
+
+# histogram of price
+ggplot(usedcars, aes(price)) + geom_histogram()
+
+# boxplot of price
+ggplot(usedcars, aes(y = price)) + geom_boxplot()
+
+# boxplot of price by model
+ggplot(usedcars, aes(x = model, y = price)) + geom_boxplot()
+
+# use crosstable
+library(gmodels)
+CrossTable(usedcars$transmission, usedcars$model)
+```
+
+## Assignment 1A
+
+# Answer 1
+```{r}
+student_name <- c("Bob Dole", "Joe Schmo", "Betty White")
+gpa <- c(3.2, 3.5, 3.7)
+gender <- c("M", "M", "F")
+grade <- c("junior", "sophomore", "senior")
+```
+
+# Answer 2: M, junior, sophomore
+```{r}
+gender[2]
+grade[1:2]
+```
+
+# Answer 3
+```{r}
+gender <- factor(c("M", "M", "F"), levels = c("F", "M"))
+grade <- factor(c("junior", "sophomore", "senior"), levels = c("freshman", "sophomore", "junior", "senior"), ordered = T)
+```
+
+# Answer 4: Rows: 3, Columns: 4
+```{r}
+dataframe <- data.frame(student_name, gpa, gender, grade, stringsAsFactors = F)
+
+dataframe
+```
+
+# Answer 5
+```{r}
+dataframe[,2]
+
+dataframe[c("student_name", "grade")]
+```
+
+# Answer 6: 3.2
+```{r}
+dataframe[1,2]
+```
+
+# Answer 7
+```{r}
+dataframe[c(2,3),c(3,4)]
+```
+
+# Answer 8
+```{r}
+dataframe[,2]
+dataframe[3,]
+dataframe[,]
+```
+
+# Answer 9
+```{r}
+M <- matrix(c("a", "b", "c", "d", "e", "f", "g", "h"), nrow = 4)
+M
+
+N <-  matrix(c("a", "b", "c", "d", "e", "f", "g", "h", "i"), nrow = 3)
+N
+```
+
+# Answer 10: b, f
+```{r}
+M[2,1]
+N[3,2]
+```
+
+# Answer 11
+```{r}
+M[2,]
+N[,3]
+```
+
+## Assignment 1B
+
+# Answer 1: 128 houses
+```{r}
+houseprices <- read_csv("1b_HousePrices.csv")
+str(houseprices)
+```
+
+# Answer 2: Max house price: 211200, median offers: 3, mean SqFt: 2001
+```{r}
+summary(houseprices)
+```
+
+# Answer 3: mean bedrooms: 3.023, median bedrooms: 3
+```{r}
+mean(houseprices$Bedrooms)
+median(houseprices$Bedrooms)
+```
+
+# Answer 4: range: 69100-211200, diff: 142100
+```{r}
+range(houseprices$Price)
+diff(range(houseprices$Price))
+```
+
+# Answer 5: 36925
+```{r}
+IQR(houseprices$Price)
+```
+
+# Answer 6:
+```{r}
+quantile(houseprices$Price, c(0, 0.2, 0.4, 0.6, 0.8, 1))
+```
+
+# Answer 7: middle line represents the median
+```{r}
+ggplot(houseprices, aes(y = Price)) + geom_boxplot()
+
+ggplot(houseprices, aes(y = SqFt)) + geom_boxplot()
+```
+
+# Answer 8: Highest frequency price range: 115000-120000 Highest frequency offer range: 3
+```{r}
+ggplot(houseprices, aes(x = Price)) + geom_histogram(binwidth = 5000)
+
+ggplot(houseprices, aes(x = Offers)) + geom_histogram()
+```
+
+# Answer 9: variance: 721930821, sd: 26868.77
+```{r}
+var(houseprices$Price)
+sd(houseprices$Price)
+```
+
+# Answer 10: 42 houses built with bricks, 39 houses on West side
+```{r}
+table(houseprices$Brick)
+table(houseprices$Neighborhood)
+```
+
+# Answer 11: 35.16% of houses are on East side
+```{r}
+neighborhood_table <- table(houseprices$Neighborhood)
+prop.table(neighborhood_table)
+```
+
+# Answer 12: 32.81% of houses are brick
+```{r}
+brick_table <- table(houseprices$Brick)
+prop.table(brick_table)
+```
+
+# Answer 13: All other things equal, as SqFt increases, Price increases
+```{r}
+ggplot(houseprices, aes(x = SqFt, y = Price)) + geom_point()
+```
+
+# Answer 14: houses built w/brick in north neighborhood: 7
+```{r}
+library(gmodels)
+CrossTable(houseprices$Brick, houseprices$Neighborhood)
+```
+
+## Assignment 1C
+
+# Answer 1: 1436 cars in the dataset
+```{r}
+toyota <- read_csv("1c_ToyotaCorolla.csv")
+str(toyota)
+```
+
+# Answer 2: Max car price: 32500, median car age: 61, mean weight: 1072, mean KM: 68533
+```{r}
+summary(toyota)
+```
+
+# Answer 3: mean HP: 101.50 median HP: 110
+```{r}
+mean(toyota$HP)
+median(toyota$HP)
+```
+
+# Answer 4: range: 4350-32500, diff: 28150
+```{r}
+range(toyota$Price)
+diff(range(toyota$Price))
+```
+
+# Answer 5: IQR: 3500
+```{r}
+IQR(toyota$Price)
+```
+
+# Answer 6:
+```{r}
+quantile(toyota$Price, c(0, 0.25, 0.5, 0.75, 1))
+```
+
+# Answer 7: Bottom line stands for the lowest point 1.5 * IQR below the lower quartile (anything below that point is considered an outlier on the low end)
+```{r}
+ggplot(toyota, aes(y = Age)) + geom_boxplot()
+ggplot(toyota, aes(y = KM)) + geom_boxplot()
+```
+
+# Answer 8: Highest frequency price range: 8500-9500, Highest freqency weight range: 1040-1060
+```{r}
+ggplot(toyota, aes(x = Price)) + geom_histogram(binwidth = 1000)
+ggplot(toyota, aes(x = Weight)) + geom_histogram(binwidth = 20)
+```
+
+# Answer 9: Variance: 13154872, Sd: 3626.97
+```{r}
+var(toyota$Price)
+sd(toyota$Price)
+```
+
+# Answer 10: 969 cars are metallic, 674 cars have 5 doors, 17 cars use CNG as fuel type
+```{r}
+table(toyota$MetColor)
+table(toyota$Doors)
+table(toyota$FuelType)
+```
+
+# Answer 11: 0.10793872 proportion of cars use Diesel
+```{r}
+FuelTable <- table(toyota$FuelType)
+prop.table(FuelTable)
+```
+
+# Answer 12:10.79% of cars use Diesel
+```{r}
+FuelTable <- table(toyota$FuelType)
+prop.table(FuelTable)
+```
+
+# Answer 13: As KM increases, Price decreases non-linearly toward a lower limit > 0
+```{r}
+ggplot(toyota, aes(x = KM, y = Price)) + geom_point()
+```
+
+# Answer 14: Cars w/automatic transmission, diesel: 0. Cars w/automatic transmission & 5 doors: 30
+```{r}
+CrossTable(toyota$Automatic, toyota$FuelType)
+CrossTable(toyota$Automatic, toyota$Doors)
+```
